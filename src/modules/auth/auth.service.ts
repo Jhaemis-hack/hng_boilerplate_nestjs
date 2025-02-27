@@ -84,6 +84,14 @@ export default class AuthenticationService {
       oranisations: userOranisations,
     };
 
+    // send welcome mail
+    await this.emailService.sendUserConfirmationMail(
+      user.email,
+      user.first_name,
+      `${process.env.FRONTEND_URL}/confirm-email`,
+      token
+    );
+
     return {
       message: SYS_MSG.USER_CREATED_SUCCESSFULLY,
       access_token,
