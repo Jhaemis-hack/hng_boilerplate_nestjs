@@ -48,10 +48,11 @@ export default class EmailQueueConsumer {
       const {
         data: { mail },
       } = job;
+
       await this.mailerService.sendMail({
         ...mail,
         subject: 'Reset Password',
-        template: 'reset-password',
+        template: 'Reset-Password-Template',
       });
     } catch (sendResetPasswordEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendResetPasswordEmailJobError: ${sendResetPasswordEmailJobError}`);

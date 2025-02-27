@@ -42,11 +42,12 @@ export class EmailService {
     await this.mailerService.sendMail({ variant: 'register-otp', mail: mailPayload });
   }
 
-  async sendForgotPasswordMail(email: string, url: string, token: string) {
+  async sendForgotPasswordMail(email: string, name: string, url: string, token: string) {
     const link = `${url}?token=${token}`;
     const mailPayload: MailInterface = {
       to: email,
       context: {
+        name,
         link,
         email,
       },

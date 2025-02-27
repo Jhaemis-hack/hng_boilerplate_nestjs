@@ -405,3 +405,8 @@ dist
 # User specific ignores 
 todo.txt
 .vscode/
+
+
+docker-compose.yml
+data/
+.dev.env
