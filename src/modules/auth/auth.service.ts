@@ -98,7 +98,12 @@ export default class AuthenticationService {
     }
 
     const token = (await this.otpService.createOtp(user.id)).token;
-    await this.emailService.sendForgotPasswordMail(user.email, `${process.env.FRONTEND_URL}/reset-password`, token);
+    await this.emailService.sendForgotPasswordMail(
+      user.email,
+      user.first_name,
+      `${process.env.FRONTEND_URL}/reset-password`,
+      token
+    );
 
     return {
       message: SYS_MSG.EMAIL_SENT,
