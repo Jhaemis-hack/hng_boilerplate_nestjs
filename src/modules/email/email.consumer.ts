@@ -20,6 +20,7 @@ export default class EmailQueueConsumer {
         subject: 'Welcome to My App! Confirm your Email',
         template: 'Welcome-Template',
       });
+      this.logger.log(`Welcome email sent successfully to ${mail.to}`);
     } catch (sendWelcomeEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendWelcomeEmailJobError:  ${sendWelcomeEmailJobError}`);
     }
@@ -37,6 +38,7 @@ export default class EmailQueueConsumer {
         subject: 'Waitlist Confirmation',
         template: 'waitlist',
       });
+      this.logger.log(`Waitlist email sent successfully to ${mail.to}`);
     } catch (sendWaitlistEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendWaitlistEmailJobError: ${sendWaitlistEmailJobError}`);
     }
@@ -54,6 +56,7 @@ export default class EmailQueueConsumer {
         subject: 'Reset Password',
         template: 'Reset-Password-Template',
       });
+      this.logger.log(`Reset password email sent successfully to ${mail.to}`);
     } catch (sendResetPasswordEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendResetPasswordEmailJobError: ${sendResetPasswordEmailJobError}`);
     }
@@ -70,6 +73,7 @@ export default class EmailQueueConsumer {
         subject: 'Monthly Newsletter',
         template: 'newsletter',
       });
+      this.logger.log(`Newsletter email sent successfully to ${mail.to}`);
     } catch (sendNewsletterEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendNewsletterEmailJobError:   ${sendNewsletterEmailJobError}`);
     }
@@ -86,6 +90,7 @@ export default class EmailQueueConsumer {
         subject: 'Welcome to My App! Confirm your Email',
         template: 'register-otp',
       });
+      this.logger.log(`Register OTP email sent successfully to ${mail.to}`);
     } catch (sendTokenEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendTokenEmailJobError:   ${sendTokenEmailJobError}`);
     }
@@ -102,6 +107,7 @@ export default class EmailQueueConsumer {
         subject: 'Login with OTP',
         template: 'login-otp',
       });
+      this.logger.log(`Login OTP email sent successfully to ${mail.to}`);
     } catch (sendLoginOtpEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendLoginOtpEmailJobError:   ${sendLoginOtpEmailJobError}`);
     }
@@ -118,6 +124,7 @@ export default class EmailQueueConsumer {
         subject: 'In-App, Notification',
         template: 'notification',
       });
+      this.logger.log(`Notification email sent successfully to ${mail.to}`);
     } catch (sendLoginOtpEmailJobError) {
       this.logger.error(`EmailQueueConsumer ~ sendLoginOtpEmailJobError:   ${sendLoginOtpEmailJobError}`);
     }
