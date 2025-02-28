@@ -423,6 +423,13 @@ docker-compose.yml
 data/
 >>>>>>> d080450 (chore: created a docker-compose.yml file and updated the gitignore)
 
-# Docker compose
+data/
+docker-compose.yml
+package-lock.json
+.dev.env
+
+
+package-lock.json
 docker-compose.yml
 data/
+.dev.env
