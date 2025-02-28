@@ -51,7 +51,7 @@ export class InviteService {
       throw new InternalServerErrorException(`Internal server error: ${error.message}`);
     }
   }
-  // invite.service.ts - Changes to the findAllInvitations method
+
   async findAllInvitations(
     page: number = 1,
     limit: number = 10

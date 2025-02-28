@@ -1,4 +1,3 @@
-// dto/all-invitations-response.dto.ts
 import { InviteDto } from './invite.dto';
 import { ApiProperty } from '@nestjs/swagger';
 

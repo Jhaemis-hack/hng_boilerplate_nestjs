@@ -52,7 +52,7 @@ describe('InviteService', () => {
             save: jest.fn(),
             findOneBy: jest.fn(),
             update: jest.fn(),
-            findAndCount: jest.fn(), // Added this line because of pagination
+            findAndCount: jest.fn(),
           },
         },
         {
