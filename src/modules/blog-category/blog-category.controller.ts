@@ -4,6 +4,7 @@ import { BlogCategoryService } from './blog-category.service';
 import { SuperAdminGuard } from '@guards/super-admin.guard';
 import { CreateBlogCategoryDto } from './dto/create-blog-category.dto';
 import { UpdateBlogCategoryDto } from './dto/update-blog-category.dto';
+import { skipAuth } from '@shared/helpers/skipAuth';
 
 @ApiTags('Blog Categories')
 @Controller('blogs/categories')
@@ -13,6 +14,7 @@ export class BlogCategoryController {
   @Post()
   @UseGuards(SuperAdminGuard)
   @ApiBearerAuth()
+  @skipAuth()
   @ApiOperation({ summary: 'Create a new blog category' })
   @ApiResponse({ status: 201, description: 'Blog category created successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid request data. Please provide a valid category name.' })
@@ -40,6 +42,7 @@ export class BlogCategoryController {
   @Delete(':id')
   @UseGuards(SuperAdminGuard)
   @ApiBearerAuth()
+  @skipAuth()
   @ApiOperation({ summary: 'Delete an organisation category' })
   @ApiResponse({ status: 200, description: 'Organisation category updated successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid request data. Please provide valid data.' })
