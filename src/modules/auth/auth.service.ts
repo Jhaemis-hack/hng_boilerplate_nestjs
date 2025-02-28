@@ -73,11 +73,8 @@ export default class AuthenticationService {
 
       const newOrganisation = await this.organisationService.create(createOrganisationPayload);
 
-      const userOrganisations = await this.organisationService.getAllUserOrganisations(user.id);
-
+      const userOrganisations = await this.organisationService.getAllUserOrganisations(user.id, 1, 10);
       const isSuperAdmin = userOrganisations.map(instance => instance.user_role).includes('super-admin');
-    const userOranisations = await this.organisationService.getAllUserOrganisations(user.id, 1, 10);
-   
 
       const token = (await this.otpService.createOtp(user.id, manager)).token;
 
