@@ -24,6 +24,10 @@ import { AddCommentDto } from '../comments/dto/add-comment.dto';
 import { GetTotalProductsResponseDto } from './dto/get-total-products.dto';
 import { SuperAdminGuard } from '../../guards/super-admin.guard';
 import { skipAuth } from '../../helpers/skipAuth';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { User } from '../user/entities/user.entity';
+import { AuthGuard } from '../../guards/auth.guard';
+import { CurrentUser } from './current-user.decorator';
 
 @ApiTags('Products')
 @Controller('')
@@ -179,5 +183,33 @@ export class ProductsController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async getProductStock(@Param('productId') productId: string) {
     return this.productsService.getProductStock(productId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Post(':productId/review')
+  @ApiOperation({ summary: 'Submit or Update Product Review' })
+  async submitReview(
+    @Param('productId') productId: string,
+    @CurrentUser() user: User, // Use the correct custom decorator
+    @Body() dto: CreateReviewDto // Consistent DTO name
+  ) {
+    console.log(productId);
+
+    return this.productsService.submitReview(user.id, productId, dto);
+  }
+
+  @Delete(':productId/reviews')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete Product Review' })
+  async deleteReview(@Param('productId') productId: string, @CurrentUser() user: User) {
+    return this.productsService.deleteReview(user.id, productId);
+  }
+
+  @Get('view/reviews/:productId')
+  @ApiOperation({ summary: 'Get Product Details (with Reviews)' })
+  async getProductDetails(@Param('productId') productId: string) {
+    return this.productsService.getProductDetails(productId);
   }
 }

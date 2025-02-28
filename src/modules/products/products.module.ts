@@ -13,6 +13,7 @@ import { Role } from '../role/entities/role.entity';
 import { Product } from './entities/product.entity';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { Review } from './entities/review.entity';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ProductsService } from './products.service';
       Order,
       OrderItem,
       Cart,
+      Review,
     ]),
     UserModule,
   ],
