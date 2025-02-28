@@ -405,3 +405,4 @@ dist
 # User specific ignores 
 todo.txt
 .vscode/
+data/db/
