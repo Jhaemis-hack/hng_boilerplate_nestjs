@@ -10,6 +10,7 @@ import {
   Body,
   Res,
   UseGuards,
+  Query, // Added this import
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { InviteService } from './invite.service';
@@ -25,12 +26,14 @@ import { SendInvitationsResponseDto } from './dto/send-invitations-response.dto'
 import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { OwnershipGuard } from '@guards/authorization.guard';
 import * as SYS_MSG from '@shared/constants/SystemMessages';
+import { PaginationQueryDto } from './dto/pagination-query.dto'; // Added this import
 @ApiBearerAuth()
 @ApiTags('Organisation Invites')
 @Controller('organizations')
 export class InviteController {
   constructor(private readonly inviteService: InviteService) {}
 
+  // invite.controller.ts - Changes to the findAllInvitations method
   @ApiOperation({ summary: 'Get All Invitations' })
   @ApiResponse({
     status: 200,
@@ -43,10 +46,11 @@ export class InviteController {
     type: ErrorResponseDto,
   })
   @Get('invites')
-  async findAllInvitations() {
-    const allInvites = await this.inviteService.findAllInvitations();
+  async findAllInvitations(@Query() paginationQuery: PaginationQueryDto) {
+    const allInvites = await this.inviteService.findAllInvitations(paginationQuery.page, paginationQuery.limit);
     return allInvites;
   }
+
   @ApiOperation({ summary: 'Get All Pending Invitations' })
   @ApiResponse({
     status: 200,
