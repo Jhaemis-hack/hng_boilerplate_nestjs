@@ -128,10 +128,12 @@ export class BlogService {
         ...result.data,
         blogs: includeDeleted
           ? result.data.blogs
-          : result.data.blogs.map(blog => {
-              const { deletedAt, ...rest } = blog;
-              return rest;
-            }),
+          : result.data.blogs
+              .filter(blog => !blog.deletedAt)
+              .map(blog => {
+                const { deletedAt, ...rest } = blog;
+                return rest;
+              }),
       },
     };
   }
