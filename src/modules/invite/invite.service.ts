@@ -51,11 +51,28 @@ export class InviteService {
       throw new InternalServerErrorException(`Internal server error: ${error.message}`);
     }
   }
-  async findAllInvitations(): Promise<{ status_code: number; message: string; data: InviteDto[] }> {
+  // invite.service.ts - Changes to the findAllInvitations method
+  async findAllInvitations(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{
+    status: string;
+    status_code: number;
+    message: string;
+    data: { invitations: InviteDto[]; total: number };
+  }> {
     try {
-      const invites = await this.inviteRepository.find();
+      // Calculate skip value for pagination
+      const skip = (page - 1) * limit;
 
-      const allInvites: InviteDto[] = invites.map(invite => {
+      // Get paginated invites
+      const [invites, total] = await this.inviteRepository.findAndCount({
+        skip,
+        take: limit,
+      });
+
+      // Map to DTOs
+      const invitesDto: InviteDto[] = invites.map(invite => {
         return {
           token: invite.token,
           id: invite.id,
@@ -67,9 +84,13 @@ export class InviteService {
       });
 
       const responseData = {
+        status: 'success',
         status_code: HttpStatus.OK,
-        message: 'Successfully fetched invites',
-        data: allInvites,
+        message: 'Invitations retrieved successfully',
+        data: {
+          invitations: invitesDto,
+          total,
+        },
       };
 
       return responseData;
