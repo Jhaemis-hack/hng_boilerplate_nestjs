@@ -415,6 +415,9 @@ todo.txt
 docker-compose.yml
 data/
 
+# Docker compose
+docker-compose.yml
+data/
 
 data/
 docker-compose.yml
