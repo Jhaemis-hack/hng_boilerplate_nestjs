@@ -31,9 +31,14 @@ export default class AuthenticationService {
     private otpService: OtpService,
     private emailService: EmailService,
     private organisationService: OrganisationsService,
+<<<<<<< HEAD
     private profileService: ProfileService,
     private dataSource: DataSource
   ) {}
+=======
+    private profileService: ProfileService
+  ) { }
+>>>>>>> f63b542 (fix: fixed conflict from merge)
 
   async createNewUser(createUserDto: CreateUserDTO) {
     const result = await this.dataSource.transaction(async (manager: EntityManager) => {
@@ -48,12 +53,57 @@ export default class AuthenticationService {
 
       const user = await this.userService.createUser(createUserDto, manager);
 
+<<<<<<< HEAD
       if (!user) {
         throw new CustomHttpException(SYS_MSG.FAILED_TO_CREATE_USER, HttpStatus.BAD_REQUEST);
       }
       const newOrganisationPayload = {
         name: `${user.first_name}'s Organisation`,
         description: '',
+=======
+    const user = await this.userService.getUserRecord({ identifier: createUserDto.email, identifierType: 'email' });
+
+    if (!user) {
+      throw new CustomHttpException(SYS_MSG.FAILED_TO_CREATE_USER, HttpStatus.BAD_REQUEST);
+    }
+    const newOrganisationPayload = {
+      name: `${user.first_name}'s Organisation`,
+      description: '',
+      email: user.email,
+      industry: '',
+      type: '',
+      country: '',
+      address: '',
+      state: '',
+    };
+
+    const createOrganisationPayload: CreateOrganisationRecordOptions = {
+      createPayload: newOrganisationPayload,
+      dbTransaction: {
+        useTransaction: true,
+        transactionManager: manager,
+      },
+    };
+
+    const newOrganisation = await this.organisationService.create(createOrganisationPayload);
+
+    const userOrganisations = await this.organisationService.getAllUserOrganisations(user.id, 1, 10);
+    const isSuperAdmin = userOrganisations.map(instance => instance.user_role).includes('super-admin');
+
+    const token = (await this.otpService.createOtp(user.id, manager)).token;
+
+    const access_token = this.jwtService.sign({
+      id: user.id,
+      sub: user.id,
+      email: user.email,
+    });
+
+    const responsePayload = {
+      user: {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+>>>>>>> f63b542 (fix: fixed conflict from merge)
         email: user.email,
         industry: '',
         type: '',
