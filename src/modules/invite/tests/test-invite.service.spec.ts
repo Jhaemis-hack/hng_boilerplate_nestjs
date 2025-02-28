@@ -72,7 +72,6 @@ describe('InviteService', () => {
 
   describe('findAllInvitations', () => {
     it('should return paginated invitations with default parameters', async () => {
-      // Mock invites data
       const mockInvites = [
         {
           id: '1',
@@ -84,19 +83,15 @@ describe('InviteService', () => {
         },
       ];
 
-      // Setup repository mock
       mockInviteRepository.findAndCount.mockResolvedValue([mockInvites, 1]);
 
-      // Call service method
       const result = await service.findAllInvitations();
 
-      // Verify repository was called with correct params
       expect(mockInviteRepository.findAndCount).toHaveBeenCalledWith({
         skip: 0,
         take: 10,
       });
 
-      // Verify response structure
       expect(result).toEqual({
         status: 'success',
         status_code: HttpStatus.OK,
@@ -110,7 +105,6 @@ describe('InviteService', () => {
     });
 
     it('should return paginated invitations with custom parameters', async () => {
-      // Mock invites data
       const mockInvites = [
         {
           id: '1',
@@ -130,19 +124,15 @@ describe('InviteService', () => {
         },
       ];
 
-      // Setup repository mock
       mockInviteRepository.findAndCount.mockResolvedValue([mockInvites, 10]);
 
-      // Call service method with custom page and limit
       const result = await service.findAllInvitations(2, 5);
 
-      // Verify repository was called with correct params
       expect(mockInviteRepository.findAndCount).toHaveBeenCalledWith({
         skip: 5,
         take: 5,
       });
 
-      // Verify response structure
       expect(result).toEqual({
         status: 'success',
         status_code: HttpStatus.OK,
@@ -159,7 +149,6 @@ describe('InviteService', () => {
       // Setup repository mock to throw error
       mockInviteRepository.findAndCount.mockRejectedValue(new Error('Database error'));
 
-      // Verify error handling
       await expect(service.findAllInvitations()).rejects.toThrow(InternalServerErrorException);
     });
   });

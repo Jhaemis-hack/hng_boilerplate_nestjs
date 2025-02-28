@@ -154,7 +154,6 @@ describe('InviteService', () => {
   });
 
   it('should fetch all invites', async () => {
-    // Create a copy of mockInvites without the timestamp properties for comparison
     const expectedInvites = mockInvites.map(invite => {
       const { created_at, updated_at, ...rest } = invite;
       return rest;
@@ -174,7 +173,6 @@ describe('InviteService', () => {
       },
     });
 
-    // Verify that findAndCount was called
     expect(repository.findAndCount).toHaveBeenCalled();
   });
 

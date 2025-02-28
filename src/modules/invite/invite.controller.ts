@@ -10,7 +10,7 @@ import {
   Body,
   Res,
   UseGuards,
-  Query, // Added this import
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { InviteService } from './invite.service';
@@ -26,7 +26,7 @@ import { SendInvitationsResponseDto } from './dto/send-invitations-response.dto'
 import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { OwnershipGuard } from '@guards/authorization.guard';
 import * as SYS_MSG from '@shared/constants/SystemMessages';
-import { PaginationQueryDto } from './dto/pagination-query.dto'; // Added this import
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 @ApiBearerAuth()
 @ApiTags('Organisation Invites')
 @Controller('organizations')
