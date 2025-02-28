@@ -1,7 +1,7 @@
 import * as SYS_MSG from '@shared/constants/SystemMessages';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, MoreThanOrEqual, FindOptionsWhere } from 'typeorm';
+import { Repository, Like, MoreThanOrEqual, FindOptionsWhere, Not, IsNull } from 'typeorm';
 import { Blog } from './entities/blog.entity';
 import { CreateBlogDto } from './dtos/create-blog.dto';
 import { UpdateBlogDto } from './dtos/update-blog.dto';
@@ -52,21 +52,28 @@ export class BlogService {
     };
   }
 
-  async getSingleBlog(blogId: string, user: User): Promise<any> {
-    const singleBlog = await this.blogRepository.findOneBy({ id: blogId });
+  async getSingleBlog(
+    blogId: string,
+    user: User
+  ): Promise<{
+    status_code: number;
+    message: string;
+    data: BlogResponseDto;
+  }> {
+    const singleBlog = await this.blogRepository.findOneBy({ id: blogId, deletedAt: null });
     const fullName = await this.fetchUserById(user.id);
 
     if (!singleBlog) {
       throw new CustomHttpException(SYS_MSG.BLOG_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const { id, created_at, updated_at, ...rest } = singleBlog;
+    const { id, created_at, ...rest } = singleBlog;
     const author = `${fullName.first_name} ${fullName.last_name}`;
 
     return {
       status_code: 200,
       message: SYS_MSG.BLOG_FETCHED_SUCCESSFUL,
-      data: { blog_id: id, ...rest, author, published_date: created_at },
+      data: { blog_id: id, ...rest, author, published_date: created_at, created_at },
     };
   }
 
@@ -96,14 +103,40 @@ export class BlogService {
       created_at: updatedBlog.created_at,
     };
   }
+
   async deleteBlogPost(id: string): Promise<void> {
     const blog = await this.blogRepository.findOne({ where: { id } });
     if (!blog) {
       throw new CustomHttpException('Blog post with this id does not exist.', HttpStatus.NOT_FOUND);
-    } else await this.blogRepository.remove(blog);
+    } else await this.blogRepository.softRemove(blog);
   }
 
   async getAllBlogs(
+    page: number,
+    pageSize: number,
+    includeDeleted: boolean = false
+  ): Promise<{
+    status_code: number;
+    message: string;
+    data: { currentPage: number; totalPages: number; totalResults: number; blogs: BlogResponseDto[]; meta: any };
+  }> {
+    const result = await this.getBlogs(page, pageSize, includeDeleted ? {} : { deletedAt: null });
+    return {
+      status_code: result.status_code,
+      message: result.message,
+      data: {
+        ...result.data,
+        blogs: includeDeleted
+          ? result.data.blogs
+          : result.data.blogs.map(blog => {
+              const { deletedAt, ...rest } = blog;
+              return rest;
+            }),
+      },
+    };
+  }
+
+  async getDeletedBlogs(
     page: number,
     pageSize: number
   ): Promise<{
@@ -111,31 +144,13 @@ export class BlogService {
     message: string;
     data: { currentPage: number; totalPages: number; totalResults: number; blogs: BlogResponseDto[]; meta: any };
   }> {
-    const skip = (page - 1) * pageSize;
-
-    const [result, total] = await this.blogRepository.findAndCount({
-      skip,
-      take: pageSize,
-      relations: ['author'],
-    });
-
-    const data = this.mapBlogResults(result);
-    const totalPages = Math.ceil(total / pageSize);
-
+    const result = await this.getBlogs(page, pageSize, { deletedAt: Not(IsNull()) });
     return {
-      status_code: HttpStatus.OK,
-      message: SYS_MSG.BLOG_FETCHED_SUCCESSFUL,
+      status_code: result.status_code,
+      message: result.message,
       data: {
-        currentPage: page,
-        totalPages,
-        totalResults: total,
-        blogs: data,
-        meta: {
-          hasNext: page < totalPages,
-          total,
-          nextPage: page < totalPages ? page + 1 : null,
-          prevPage: page > 1 ? page - 1 : null,
-        },
+        ...result.data,
+        blogs: result.data.blogs,
       },
     };
   }
@@ -188,12 +203,56 @@ export class BlogService {
         current_page: page,
         total_pages: totalPages,
         total_results: total,
-        blogs: data,
+        blogs: data
+          .filter(blog => !blog.deletedAt)
+          .map(blog => {
+            const { deletedAt, ...rest } = blog;
+            return rest;
+          }),
         meta: {
           has_next: page < totalPages,
           total,
           next_page: page < totalPages ? page + 1 : null,
           prev_page: page > 1 ? page - 1 : null,
+        },
+      },
+    };
+  }
+
+  private async getBlogs(
+    page: number,
+    pageSize: number,
+    whereCondition: FindOptionsWhere<Blog>
+  ): Promise<{
+    status_code: number;
+    message: string;
+    data: { currentPage: number; totalPages: number; totalResults: number; blogs: BlogResponseDto[]; meta: any };
+  }> {
+    const skip = (page - 1) * pageSize;
+
+    const [result, total] = await this.blogRepository.findAndCount({
+      where: whereCondition,
+      skip,
+      take: pageSize,
+      relations: ['author'],
+    });
+
+    const data = this.mapBlogResults(result);
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+      status_code: HttpStatus.OK,
+      message: SYS_MSG.BLOG_FETCHED_SUCCESSFUL,
+      data: {
+        currentPage: page,
+        totalPages,
+        totalResults: total,
+        blogs: data,
+        meta: {
+          hasNext: page < totalPages,
+          total,
+          nextPage: page < totalPages ? page + 1 : null,
+          prevPage: page > 1 ? page - 1 : null,
         },
       },
     };
@@ -249,6 +308,7 @@ export class BlogService {
         image_urls: blog.image_urls,
         author: author_name,
         created_at: blog.created_at,
+        deletedAt: blog.deletedAt,
       };
     });
   }
