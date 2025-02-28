@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, DeleteDateColumn, BeforeUpdate } from 'typeorm';
 import { AbstractBaseEntity } from '../../../entities/base.entity';
 import { User } from '../../user/entities/user.entity';
 
@@ -16,6 +16,20 @@ export class Blog extends AbstractBaseEntity {
   @Column('simple-array', { nullable: true })
   image_urls?: string[];
 
+  @DeleteDateColumn({ nullable: true, default: null })
+  deletedAt?: Date;
+
+  @Column({ nullable: true, default: null })
+  published_date?: Date;
+
+  @Column({ nullable: true, default: null })
+  last_updated_date?: Date;
+
   @ManyToOne(() => User, user => user.blogs)
   author: User;
+
+  @BeforeUpdate()
+  updateDate() {
+    this.last_updated_date = new Date();
+  }
 }
