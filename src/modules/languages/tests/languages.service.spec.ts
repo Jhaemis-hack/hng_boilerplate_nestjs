@@ -20,6 +20,7 @@ const mockLanguageRepository = {
   create: jest.fn(),
   save: jest.fn(),
   find: jest.fn(),
+  remove: jest.fn(),
   createQueryBuilder: jest.fn(() => ({
     innerJoin: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
@@ -53,6 +54,7 @@ describe('LanguagesService', () => {
 
     service = module.get<LanguagesService>(LanguagesService);
     repository = module.get<Repository<Language>>(getRepositoryToken(Language));
+    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   it('should be defined', () => {
@@ -161,6 +163,37 @@ describe('LanguagesService', () => {
     it('should throw NotFoundException if user does not exist', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
       await expect(languageService.getUserLanguages('123')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('deleteUserLanguage', () => {
+    it('should delete a user-specific language successfully', async () => {
+      const mockUser = { id: 'user123', languages: [{ id: 'lang123', language: 'English' }] } as User;
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
+      jest.spyOn(repository, 'remove').mockResolvedValue(null);
+
+      await expect(service.deleteUserLanguage('lang123', 'user123')).resolves.toEqual({
+        message: 'Language successfully deleted for the user.',
+      });
+    });
+
+    it('should throw NotFoundException if user does not exist', async () => {
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
+      await expect(service.deleteUserLanguage('lang123', 'user123')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException if language is not found for user', async () => {
+      const mockUser = { id: 'user123', languages: [] } as User;
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
+      await expect(service.deleteUserLanguage('lang123', 'user123')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException if language has dependencies', async () => {
+      const mockUser = { id: 'user123', languages: [{ id: 'lang123', language: 'English' }] } as User;
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
+      jest.spyOn(repository, 'remove').mockRejectedValue(new Error('Cannot delete'));
+
+      await expect(service.deleteUserLanguage('lang123', 'user123')).rejects.toThrow(BadRequestException);
     });
   });
 });

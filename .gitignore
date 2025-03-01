@@ -55,6 +55,11 @@ fabric.properties
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+
+# DB
+data/db/
+
+docker-compose.yml
 # User-specific files
 *.suo
 *.user
