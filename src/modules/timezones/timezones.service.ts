@@ -22,6 +22,7 @@ import {
 
 @Injectable()
 export class TimezonesService {
+  private logger = new Logger(TimezonesService.name);
   constructor(
     @InjectRepository(Timezone)
     private readonly timezoneRepository: Repository<Timezone>
@@ -49,7 +50,7 @@ export class TimezonesService {
         timezone: newTimezone,
       };
     } catch (error) {
-      console.log('TimezonesServiceError ~ createTimezone ~', error);
+      this.logger.error('TimezonesServiceError ~ createTimezone ~', error);
       throw new InternalServerErrorException({
         message: ERROR_OCCURED,
         status_code: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -73,7 +74,7 @@ export class TimezonesService {
         timezones: formattedTimezones,
       };
     } catch (error) {
-      Logger.error('TimezonesServiceError ~ fetchTimezones ~', error);
+      this.logger.error('TimezonesServiceError ~ fetchTimezones ~', error);
       throw new InternalServerErrorException({
         message: FETCH_TIMEZONE_FAILURE,
         status_code: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -100,7 +101,7 @@ export class TimezonesService {
         timezone,
       };
     } catch (error) {
-      Logger.error('TimezonesServiceError ~ updateTimezone ~', error);
+      this.logger.error('TimezonesServiceError ~ updateTimezone ~', error);
       throw new InternalServerErrorException({
         message: ERROR_OCCURED,
         status_code: HttpStatus.INTERNAL_SERVER_ERROR,
