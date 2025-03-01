@@ -89,8 +89,22 @@ describe('CommentsService', () => {
       });
     });
 
+    it('should throw CustomHttpException if user is not found', async () => {
+      commentRepository.findOne.mockResolvedValue({ id: 'comment-id', dislikes: 0 });
+      userRepository.findOne.mockResolvedValue(null); // Simulating a missing user
+
+      await expect(service.dislikeComment('comment-id', 'user-id')).rejects.toThrow(CustomHttpException);
+      await expect(service.dislikeComment('comment-id', 'user-id')).rejects.toMatchObject({
+        message: 'User not found',
+        status: HttpStatus.NOT_FOUND,
+      });
+    });
+
     it('should dislike a comment successfully', async () => {
+      const mockUser = { id: 'user-id', name: 'Test User' };
       const mockComment = { id: 'comment-id', dislikes: 0 };
+
+      userRepository.findOne.mockResolvedValue(mockUser); // Mock user repository
       commentRepository.findOne.mockResolvedValue(mockComment);
       commentRepository.save.mockResolvedValue({ ...mockComment, dislikes: 1 });
 
