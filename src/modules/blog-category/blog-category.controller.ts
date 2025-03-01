@@ -42,7 +42,6 @@ export class BlogCategoryController {
   @Delete(':id')
   @UseGuards(SuperAdminGuard)
   @ApiBearerAuth()
-  @skipAuth()
   @ApiOperation({ summary: 'Delete an organisation category' })
   @ApiResponse({ status: 200, description: 'Organisation category updated successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid request data. Please provide valid data.' })
