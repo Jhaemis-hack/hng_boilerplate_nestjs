@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import * as SYS_MSG from '@shared/constants/SystemMessages';
 import { JwtService } from '@nestjs/jwt';
