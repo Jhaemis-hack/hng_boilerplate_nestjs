@@ -9,19 +9,19 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
 import { Repository } from 'typeorm';
-import { CustomHttpException } from '../../helpers/custom-http-filter';
-import * as SYS_MSG from '../../helpers/SystemMessages';
+import * as SYS_MSG from '@shared/constants/SystemMessages';
 import { AddCommentDto } from '../comments/dto/add-comment.dto';
 import { Comment } from '../comments/entities/comments.entity';
 import { Organisation } from '../organisations/entities/organisations.entity';
 import { User } from '../user/entities/user.entity';
 import { CreateProductRequestDto } from './dto/create-product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
-import { ProductVariant } from './entities/product-variant.entity';
 import { Product, ProductSizeType, StockStatusType } from './entities/product.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { Review } from './entities/review.entity';
 import { ProductResponseDto } from './dto/product-response.dto';
+import { CustomHttpException } from '@shared/helpers/custom-http-filter';
+
 
 interface SearchCriteria {
   name?: string;
