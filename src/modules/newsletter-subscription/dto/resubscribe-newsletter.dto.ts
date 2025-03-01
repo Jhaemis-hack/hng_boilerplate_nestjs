@@ -10,7 +10,7 @@ export class ResubscribeNewsletterDto {
   email?: string;
 
   @IsNotEmpty()
-  validateUserIdentifier() {
+  validateUserIdentifier?() {
     if (!this.id && !this.email) {
       throw new Error('Either userId or email must be provided.');
     }
