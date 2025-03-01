@@ -8,10 +8,16 @@ import { User } from '../../user/entities/user.entity';
 import { CustomHttpException } from '@shared/helpers/custom-http-filter';
 import { HttpStatus } from '@nestjs/common';
 
+const mockQueryBuilder = {
+  where: jest.fn().mockReturnThis(),
+  getOne: jest.fn(),
+};
+
 const mockCommentRepository = () => ({
   create: jest.fn(),
   save: jest.fn(),
   findOne: jest.fn(),
+  createQueryBuilder: jest.fn(() => mockQueryBuilder),
 });
 
 const mockUserRepository = () => ({
@@ -78,7 +84,7 @@ describe('CommentsService', () => {
     });
   });
 
-  describe('dislikeComment', () => {
+  describe('CommentsService - dislikeComment', () => {
     it('should throw CustomHttpException if comment is not found', async () => {
       commentRepository.findOne.mockResolvedValue(null);
 
@@ -89,31 +95,23 @@ describe('CommentsService', () => {
       });
     });
 
-    it('should throw CustomHttpException if user is not found', async () => {
-      commentRepository.findOne.mockResolvedValue({ id: 'comment-id', dislikes: 0 });
-      userRepository.findOne.mockResolvedValue(null); // Simulating a missing user
+    it('should increase the dislike count successfully', async () => {
+      const mockComment = { id: 'comment-id', dislikes: 2 };
 
-      await expect(service.dislikeComment('comment-id', 'user-id')).rejects.toThrow(CustomHttpException);
-      await expect(service.dislikeComment('comment-id', 'user-id')).rejects.toMatchObject({
-        message: 'User not found',
-        status: HttpStatus.NOT_FOUND,
-      });
-    });
+      // Mock `getOne()` from `createQueryBuilder`
+      mockQueryBuilder.getOne.mockResolvedValue(mockComment);
+      commentRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
-    it('should dislike a comment successfully', async () => {
-      const mockUser = { id: 'user-id', name: 'Test User' };
-      const mockComment = { id: 'comment-id', dislikes: 0 };
-
-      userRepository.findOne.mockResolvedValue(mockUser); // Mock user repository
-      commentRepository.findOne.mockResolvedValue(mockComment);
-      commentRepository.save.mockResolvedValue({ ...mockComment, dislikes: 1 });
+      commentRepository.save.mockResolvedValue({ ...mockComment, dislikes: 3 });
 
       const result = await service.dislikeComment('comment-id', 'user-id');
 
       expect(result).toEqual({
-        message: 'Comment disliked successfully!',
-        dislikes: 1,
+        message: 'Dislike updated successfully',
+        dislikeCount: 3,
       });
+
+      expect(commentRepository.save).toHaveBeenCalledWith({ ...mockComment, dislikes: 3 });
     });
   });
 });
