@@ -10,7 +10,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
 import { Repository } from 'typeorm';
 import * as SYS_MSG from '@shared/constants/SystemMessages';
-import { AddCommentDto } from '../comments/dto/add-comment.dto';
 import { Comment } from '../comments/entities/comments.entity';
 import { Organisation } from '../organisations/entities/organisations.entity';
 import { User } from '../user/entities/user.entity';
@@ -18,6 +17,7 @@ import { CreateProductRequestDto } from './dto/create-product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
 import { Product, ProductSizeType, StockStatusType } from './entities/product.entity';
 import { CustomHttpException } from '@shared/helpers/custom-http-filter';
+import { AddCommentDto } from '../comments/dtos/add-comment.dto';
 
 interface SearchCriteria {
   name?: string;
@@ -58,32 +58,18 @@ export class ProductsService {
     newProduct.org = org;
     const statusCal = await this.calculateProductStatus(dto.quantity);
     newProduct.stock_status = statusCal;
-    newProduct.cost_price = 0.2 * dto.price - dto.price;
+    newProduct.cost_price = dto.price - 0.2 * dto.price;
     const product = await this.productRepository.save(newProduct);
-    if (!product || !newProduct)
-      throw new InternalServerErrorException({
-        status_code: 500,
-        status: 'Internal server error',
-        message: 'An unexpected error occurred. Please try again later.',
-      });
 
+    delete product.org;
     return {
-      status: 'success',
+      status_code: HttpStatus.CREATED,
       message: 'Product created successfully',
-      data: {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        status: product.stock_status,
-        quantity: product.quantity,
-        created_at: product.created_at,
-        updated_at: product.updated_at,
-      },
+      data: product,
     };
   }
 
-  async getAllProducts({ page = 1, pageSize = 2 }: { page: number; pageSize: number }) {
+  async getAllProducts({ page = 1, pageSize = 10 }: { page: number; pageSize: number }) {
     const skip = (page - 1) * pageSize;
     const allProucts = await this.productRepository.find({ skip, take: pageSize });
     const totalProducts = await this.productRepository.count();
@@ -135,13 +121,12 @@ export class ProductsService {
         status_code: 422,
       });
 
-    const { name, category, minPrice, maxPrice } = criteria;
+    const { name, minPrice, maxPrice } = criteria;
     const query = this.productRepository.createQueryBuilder('product').where('product.orgId = :orgId', { orgId });
 
     if (name) {
       query.andWhere('product.name ILIKE :name', { name: `%${name}%` });
     }
-
     if (minPrice) {
       query.andWhere('product.price >= :minPrice', { minPrice });
     }
@@ -162,7 +147,7 @@ export class ProductsService {
     return {
       success: true,
       statusCode: 200,
-      products,
+      data: products,
     };
   }
 
@@ -172,26 +157,9 @@ export class ProductsService {
   }
 
   async updateProduct(id: string, productId: string, updateProductDto: UpdateProductDTO) {
-    const org = await this.organisationRepository.findOne({ where: { id } });
-    if (!org)
-      throw new InternalServerErrorException({
-        status: 'Unprocessable entity exception',
-        message: 'Invalid organisation credentials',
-        status_code: 422,
-      });
-    const product = await this.productRepository.findOne({ where: { id: productId }, relations: ['org'] });
+    const product = await this.productRepository.findOne({ where: { id: productId, org: { id } } });
     if (!product) {
-      throw new NotFoundException({
-        error: 'Product not found',
-        status_code: HttpStatus.NOT_FOUND,
-      });
-    }
-
-    if (product.org.id !== org.id) {
-      throw new ForbiddenException({
-        status: 'fail',
-        message: 'Not allowed to perform this action',
-      });
+      throw new NotFoundException('Invalid products credentials');
     }
 
     try {
@@ -249,7 +217,6 @@ export class ProductsService {
   }
 
   async addCommentToProduct(productId: string, commentDto: AddCommentDto, userId: string) {
-    const { comment } = commentDto;
     const product = await this.productRepository.findOne({ where: { id: productId } });
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -257,7 +224,7 @@ export class ProductsService {
       throw new CustomHttpException(SYS_MSG.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const productComment = this.commentRepository.create({ comment, product, user });
+    const productComment = this.commentRepository.create({ ...commentDto, product, user });
 
     const saveComment = await this.commentRepository.save(productComment);
 
@@ -317,10 +284,9 @@ export class ProductsService {
     const lastMonthEnds = this.getDateRange(lastMonth).monthEnds;
 
     const totalProductsThisMonth = await this.getTotalProductsForDateRange(monthStarts, monthEnds);
-
     const totalProductsLastMonth = await this.getTotalProductsForDateRange(lastMonthStarts, lastMonthEnds);
 
-    let percentageChange;
+    let percentageChange: string;
 
     if (totalProductsLastMonth === totalProductsThisMonth) {
       percentageChange =

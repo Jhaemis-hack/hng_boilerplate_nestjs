@@ -20,7 +20,7 @@ import { isUUID } from 'class-validator';
 import { GetTotalProductsResponseDto } from './dto/get-total-products.dto';
 import { skipAuth } from '@shared/helpers/skipAuth';
 import { OwnershipGuard } from '@guards/authorization.guard';
-import { AddCommentDto } from '@modules/comments/dto/add-comment.dto';
+import { AddCommentDto } from '@modules/comments/dtos/add-comment.dto';
 import { INVALID_ORG_ID, INVALID_PRODUCT_ID } from '@shared/constants/SystemMessages';
 import { CustomHttpException } from '@shared/helpers/custom-http-filter';
 import { SuperAdminGuard } from '@guards/super-admin.guard';
@@ -62,7 +62,7 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(SuperAdminGuard)
+  // @UseGuards(SuperAdminGuard)
   @Get('organisations/products/total')
   @ApiOkResponse({ type: GetTotalProductsResponseDto, description: 'Total Products fetched successfully' })
   @ApiResponse({ status: 500, description: 'Internal server error' })

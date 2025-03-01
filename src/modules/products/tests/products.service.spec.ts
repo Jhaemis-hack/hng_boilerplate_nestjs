@@ -8,7 +8,6 @@ import { Organisation } from '../../../modules/organisations/entities/organisati
 import { orgMock } from '../../../modules/organisations/tests/mocks/organisation.mock';
 import { User } from '../../../modules/user/entities/user.entity';
 import { mockUser } from '../../../modules/user/tests/mocks/user.mock';
-import { AddCommentDto } from '../../comments/dto/add-comment.dto';
 import { UpdateProductDTO } from '../dto/update-product.dto';
 import { ProductVariant } from '../entities/product-variant.entity';
 import { Product } from '../entities/product.entity';
@@ -17,6 +16,7 @@ import { mockComment } from './mocks/comment.mock';
 import { deletedProductMock } from './mocks/deleted-product.mock';
 import { createProductRequestDtoMock } from './mocks/product-request-dto.mock';
 import { productMock } from './mocks/product.mock';
+import { AddCommentDto } from '../../comments/dtos/add-comment.dto';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -80,7 +80,6 @@ describe('ProductsService', () => {
     const createdProduct = await service.createProduct(orgMock.id, createProductRequestDtoMock);
 
     expect(createdProduct.message).toEqual('Product created successfully');
-    expect(createdProduct.status).toEqual('success');
   });
 
   describe('searchProducts', () => {
@@ -97,7 +96,7 @@ describe('ProductsService', () => {
 
       const products = await service.searchProducts(orgMock.id, searchCriteria);
 
-      expect(products).toEqual({ success: true, statusCode: 200, products: [productMock] });
+      expect(products).toEqual({ success: true, statusCode: 200, data: [productMock] });
     });
 
     it('should return products based on price range search', async () => {
@@ -113,7 +112,7 @@ describe('ProductsService', () => {
 
       const products = await service.searchProducts(orgMock.id, searchCriteria);
 
-      expect(products).toEqual({ success: true, statusCode: 200, products: [productMock] });
+      expect(products).toEqual({ success: true, statusCode: 200, data: [productMock] });
     });
 
     it('should return products based on combined search criteria', async () => {
@@ -129,7 +128,7 @@ describe('ProductsService', () => {
 
       const products = await service.searchProducts(orgMock.id, searchCriteria);
 
-      expect(products).toEqual({ success: true, statusCode: 200, products: [productMock] });
+      expect(products).toEqual({ success: true, statusCode: 200, data: [productMock] });
     });
 
     it('should throw NotFoundException if no products match search criteria', async () => {
@@ -217,7 +216,7 @@ describe('ProductsService', () => {
     });
 
     it('should throw an error', async () => {
-      const addCommentDto: AddCommentDto = {
+      const AddCommentDto: AddCommentDto = {
         comment: 'New Comment',
       };
 
@@ -226,7 +225,7 @@ describe('ProductsService', () => {
       jest.spyOn(commentRepository, 'create').mockReturnValue(mockComment);
       jest.spyOn(commentRepository, 'save').mockResolvedValue(mockComment);
 
-      await expect(service.addCommentToProduct(productMock.id, addCommentDto, mockUser.id)).rejects.toThrow(
+      await expect(service.addCommentToProduct(productMock.id, AddCommentDto, mockUser.id)).rejects.toThrow(
         CustomHttpException
       );
     });
