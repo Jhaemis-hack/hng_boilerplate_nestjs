@@ -18,7 +18,6 @@ import { ProductsService } from './products.service';
 import { UpdateProductDTO } from './dto/update-product.dto';
 import { isUUID } from 'class-validator';
 import { GetTotalProductsResponseDto } from './dto/get-total-products.dto';
-import { skipAuth } from '../../helpers/skipAuth';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from '../user/entities/user.entity';
 import { AuthGuard } from '../../guards/auth.guard';
