@@ -22,14 +22,6 @@ export class Blog extends AbstractBaseEntity {
   @Column({ nullable: true, default: null })
   published_date?: Date;
 
-  @Column({ nullable: true, default: null })
-  last_updated_date?: Date;
-
   @ManyToOne(() => User, user => user.blogs)
   author: User;
-
-  @BeforeUpdate()
-  updateDate() {
-    this.last_updated_date = new Date();
-  }
 }

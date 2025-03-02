@@ -67,7 +67,7 @@ export class BlogService {
       throw new CustomHttpException(SYS_MSG.BLOG_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const { id, created_at, ...rest } = singleBlog;
+    const { id, created_at, updated_at, ...rest } = singleBlog;
     const author = `${fullName.first_name} ${fullName.last_name}`;
 
     return {
