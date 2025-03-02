@@ -10,6 +10,7 @@ export const mockComment: Comment = {
   user: mockUser,
   product: productMock,
   dislikes: 0,
+  dislikedBy: [],
   created_at: new Date(),
   updated_at: new Date(),
 };

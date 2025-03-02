@@ -111,9 +111,9 @@ describe('CommentsService', () => {
       it('should delete a comment successfully', async () => {
         const commentId = 'comment-id';
         const userId = 'user-id';
-        const mockUser = { id: 'user-id' };
+        const mockUser = { id: userId };
         const mockComment = {
-          id: 'comment-id',
+          id: commentId,
           model_id: '1',
           model_type: 'post',
           comment: 'A valid comment',
@@ -121,14 +121,14 @@ describe('CommentsService', () => {
         };
 
         commentRepository.findOne.mockResolvedValue(mockComment);
-        commentRepository.delete.mockResolvedValue(mockComment);
+        commentRepository.delete.mockResolvedValue({ affected: 1 });
 
         console.log(await commentRepository.findOne({ where: { id: commentId }, relations: ['user'] })); // Debugging
 
         const result = await service.deleteAComment(commentId, userId);
 
         expect(commentRepository.findOne).toHaveBeenCalledWith({ where: { id: commentId }, relations: ['user'] });
-        expect(commentRepository.delete).toHaveBeenCalledWith(mockComment);
+        expect(commentRepository.delete).toHaveBeenCalledWith(commentId);
         expect(result).toEqual({
           message: 'Comment deleted successfully!',
           status: HttpStatus.OK,
@@ -150,7 +150,11 @@ describe('CommentsService', () => {
     });
 
     it('should increase the dislike count successfully', async () => {
-      const mockComment = { id: 'comment-id', dislikes: 2 };
+      const mockComment = {
+        id: 'comment-id',
+        dislikes: 2,
+        dislikedBy: ['user1', 'user2'], // Ensure this is initialized
+      };
 
       // Mock `getOne()` from `createQueryBuilder`
       mockQueryBuilder.getOne.mockResolvedValue(mockComment);
