@@ -12,13 +12,14 @@ import { Role } from '@modules/role/entities/role.entity';
 import { UserModule } from '@modules/user/user.module';
 import { AuthGuard } from '@guards/auth.guard';
 import { JobAccessGuard } from '@guards/job-access.guard';
+import { S3Service } from '@modules/s3/s3.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Job, User, JobApplication, Organisation, OrganisationUserRole, Profile, Role]),
     UserModule,
   ],
-  providers: [JobsService, JobAccessGuard, AuthGuard],
+  providers: [JobsService, JobAccessGuard, AuthGuard, S3Service],
   controllers: [JobsController],
 })
 export class JobsModule {}
