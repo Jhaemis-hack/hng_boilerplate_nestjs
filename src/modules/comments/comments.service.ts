@@ -54,6 +54,27 @@ export class CommentsService {
     };
   }
 
+  async deleteAComment(commentId: string, userId: string) {
+    const comment = await this.commentRepository.findOne({ where: { id: commentId }, relations: ['user'] });
+    if (!comment) {
+      throw new CustomHttpException('Comment not found', HttpStatus.NOT_FOUND);
+    }
+
+    const isOwner = comment.user.id === userId;
+
+    if (!isOwner) {
+      throw new CustomHttpException('You are not authorized to delete this comment', HttpStatus.FORBIDDEN);
+    }
+
+    await this.commentRepository.delete(comment);
+
+    return {
+      message: 'Comment deleted successfully!',
+      status: HttpStatus.OK,
+      data: { comment },
+    };
+  }
+
   async dislikeComment(commentId: string, userId: string): Promise<{ message: string; dislikeCount: number }> {
     const comment = await this.commentRepository
       .createQueryBuilder('comment')

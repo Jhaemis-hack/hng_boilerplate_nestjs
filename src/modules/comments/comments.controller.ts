@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Request, Get, Param } from '@nestjs/common';
+import { Controller, Body, Post, Request, Get, Param, Delete } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { CommentResponseDto } from './dtos/comment-response.dto';
@@ -33,5 +33,12 @@ export class CommentsController {
   async dislikeComment(@Param('id') id: string, @Request() req) {
     const { userId } = req.user;
     return await this.commentsService.dislikeComment(id, userId);
+  }
+
+  @ApiOperation({ summary: 'Delete a comment' })
+  @ApiResponse({ status: 200, description: 'The comment has been deleted successfully.' })
+  @Delete(':id/delete')
+  async deleteAComment(@Param('id') id: string, @Request() req): Promise<any> {
+    return await this.commentsService.deleteAComment(id, req.user.userId);
   }
 }
