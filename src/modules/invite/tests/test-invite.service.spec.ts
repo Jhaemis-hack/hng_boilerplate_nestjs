@@ -1,4 +1,3 @@
-// invite.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { InviteService } from '../invite.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -146,7 +145,6 @@ describe('InviteService', () => {
     });
 
     it('should handle errors and throw InternalServerErrorException', async () => {
-      // Setup repository mock to throw error
       mockInviteRepository.findAndCount.mockRejectedValue(new Error('Database error'));
 
       await expect(service.findAllInvitations()).rejects.toThrow(InternalServerErrorException);
