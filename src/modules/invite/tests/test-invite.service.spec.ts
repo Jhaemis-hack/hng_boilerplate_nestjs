@@ -9,7 +9,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { EmailService } from '@modules/email/email.service';
 import { ConfigService } from '@nestjs/config';
 import { OrganisationsService } from '@modules/organisations/organisations.service';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 
 describe('InviteService', () => {
   let service: InviteService;
@@ -47,6 +47,11 @@ describe('InviteService', () => {
     addOrganisationMember: jest.fn(),
   };
 
+  // Add a mock for EntityManager
+  const mockEntityManager = {
+    transaction: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -58,6 +63,7 @@ describe('InviteService', () => {
         { provide: EmailService, useValue: mockEmailService },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: OrganisationsService, useValue: mockOrganisationsService },
+        { provide: EntityManager, useValue: mockEntityManager }, // Add this line
       ],
     }).compile();
 
