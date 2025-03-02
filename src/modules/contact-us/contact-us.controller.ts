@@ -6,7 +6,7 @@ import { createContactDocs, getAllContactDocs } from './docs/contact-us-swagger.
 import { skipAuth } from '@shared/helpers/skipAuth';
 
 @ApiTags('Contact Us')
-@Controller('contact')
+@Controller({ path: 'contact', version: '1' })
 export class ContactUsController {
   constructor(private readonly contactUsService: ContactUsService) {}
 
