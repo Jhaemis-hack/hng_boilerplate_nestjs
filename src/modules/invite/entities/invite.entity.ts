@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../../entities/base.entity';
 import { Organisation } from '../../organisations/entities/organisations.entity';
 
@@ -18,10 +18,4 @@ export class Invite extends AbstractBaseEntity {
 
   @ManyToOne(() => Organisation, organisation => organisation.invites, { nullable: false, onDelete: 'CASCADE' })
   organisation: Organisation;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
 }
